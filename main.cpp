@@ -1,10 +1,14 @@
 #include <iostream>
 #include <string>
 #include <bits/stdc++.h>
-#include "encryptionDecryptionSequential.h"
 #include <chrono>
+#include <omp.h>
+#include "encryptionDecryptionSequential.h"
+#include "encryptionDecryptionParallel.h"
 
 using namespace std;
+
+void mainProva();
 
 string convertStringToBinary(string s){
     // hexadecimal to binary conversion
@@ -120,17 +124,20 @@ string convertBinaryToString(string s){
 
 int main(){
     ifstream file("password.txt");
+
+    // Decriptazione sequenziale
     int i = 0;
     auto start = std::chrono::system_clock::now();
 
     if (file.is_open()) {
+        generateKeys();
+        reverseKeys();
+        tablesFiller();
         for (string line; getline(file, line);) {
+            reverseKeys();
             i++;
             string pt = convertStringToBinary(line);
-            string apt = pt;
             // Calling the function to generate 16 keys
-            generateKeys();
-            tablesFiller();
             // Applying the algo
             string ct = DES(pt);
             reverseKeys();
@@ -150,6 +157,39 @@ int main(){
     auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     int sequentialTime = elapsed.count();
-    cout<<"Tempo Decriptazione Sequenziale: "<< sequentialTime;
+    cout<<"Tempo Decriptazione Sequenziale: "<< sequentialTime<<endl;
     file.close();
+
+    // Decriptazione Parallela
+    ifstream file2("password.txt");
+    i = 0;
+
+    start = std::chrono::system_clock::now();
+    // Save row of file for storing in a vector
+    int n_lines = 10000;
+    vector<string> lines(n_lines);
+    for (int j = 0; j < n_lines; ++j )
+        std::getline(file2, lines[j]);
+    file2.close();
+
+    parallelDecryption(lines);
+
+    end = std::chrono::system_clock::now();
+    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    int parallelTime = elapsed.count();
+    cout<<"Tempo Decriptazione Parallela: "<< parallelTime<<endl;
+    float speedup = sequentialTime/parallelTime;
+    cout<<"SpeedUp: "<<speedup<<endl;
+    cout<<"Differenza Tempi:"<<sequentialTime-parallelTime<<endl;
+    file2.close();
+}
+
+void mainProva(){
+    auto start = std::chrono::system_clock::now();
+    prova();
+    auto end = std::chrono::system_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    int sequentialTime = elapsed.count();
+    cout<<endl;
+    cout<<"Tempo: "<< sequentialTime<<endl;
 }

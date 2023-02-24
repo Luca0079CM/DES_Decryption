@@ -1,6 +1,7 @@
 #include "encryptionDecryptionSequential.h"
 #include <string>
 #include <cmath>
+
 using namespace std;
 
 // Array to hold 16 keys
