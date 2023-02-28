@@ -2,9 +2,9 @@
 #include <iostream>
 using namespace std;
 
-// The expansion table
+// Tabella di espansione
 int expansionTable2[48];
-// The substitution boxes. They should contain values from 0 to 15 in any order.
+// Le substitution boxes
 int substitutionBoxes2[8][4][16];
 
 string convertStringToBinary2(string s){
@@ -119,7 +119,7 @@ string convertBinaryToString2(string s){
     return hex;
 }
 
-// Function to convert a number in decimal to binary
+// Funzione per convertire un numero in una stringa binaria
 string convertDecimalToBinaryParallel(int decimal){
     string binary;
     while(decimal != 0) {
@@ -131,12 +131,12 @@ string convertDecimalToBinaryParallel(int decimal){
     }
     return binary;
 }
-// Function to convert a number in binary to decimal
+
+// Funzione per convertire una stringa binaria in un decimale
 int convertBinaryToDecimalParallel(string binary){
     int decimal = 0;
     int counter = 0;
-    int size = binary.length();
-    for(int i = size-1; i >= 0; i--){
+    for(int i = binary.length()-1; i >= 0; i--){
         if(binary[i] == '1'){
             decimal += pow(2, counter);
         }
@@ -145,11 +145,10 @@ int convertBinaryToDecimalParallel(string binary){
     return decimal;
 }
 
-// Function to generate the 16 keys.
+// Funzione per generare le 16 chiavi in modo randomico
 void generateKeysParallel(string* round_keys){
     for(int i=0; i<16; i++){
         string round_key = "";
-        // Finally, using the PC2 table to transpose the key bits
         srand((unsigned)time(NULL) * (i+1));
         int random;
         for(int j = 0; j < 48; j++){
@@ -165,11 +164,10 @@ void generateKeysParallel(string* round_keys){
     }
 }
 
-// Function to compute xor between two strings
+// Funzione per eseguire l'operazione di Xor tra due stringhe binarie
 string XorParallel(string a, string b){
     string result = "";
-    int size = b.size();
-    for(int i = 0; i < size; i++){
+    for(int i = 0; i < b.size(); i++){
         if(a[i] != b[i]){
             result += "1";
         }
@@ -180,6 +178,7 @@ string XorParallel(string a, string b){
     return result;
 }
 
+// Funzione per generare casualmente i valori della tabella di espansione e delle substitution boxes
 void tablesFillerParallel(){
     for (int i = 0; i < size(expansionTable2); i++) {
         expansionTable2[i] = rand() % 32 + 1;
@@ -188,14 +187,14 @@ void tablesFillerParallel(){
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
             for (int k = 0; k < 16; k++) {
-                substitutionBoxes2[i][j][k] = rand() % 16;
+                substitutionBoxes2[i][j][k] = rand() % 32;
             }
         }
     }
 }
 
+// Funzione per invertire le chiavi in modo da intercambiare tra encryption e decryption
 void reverseKeysParallel(string* round_keys){
-    // Reversing the round_keys array for decryption
     int i = 15;
     int j = 0;
 
@@ -208,38 +207,41 @@ void reverseKeysParallel(string* round_keys){
     }
 }
 
-// Implementing the algorithm
+// Implementazione dell'algoritmo DES
 string DESParallel(string pt, string* round_keys){
-    // 2. Dividing the result into two equal halves
+    // Divide la stringa di plaintext in due parti uguali
     string left = pt.substr(0, 32);
     string right = pt.substr(32, 32);
-    // The plain text is encrypted 16 times
+
+    // Il plaintext viene criptato 16 volte
     for(int i=0; i<16; i++) {
+        // La metà destra del plaintext viene espansa a 48 bit
         string right_expanded = "";
-        // 3.1. The right half of the plain text is expanded
         for(int j : expansionTable2) {
             right_expanded += right[j - 1];
         }
-        // 3.3. The result is xored with a key
+
+        // Viene fatto lo xor con la chiave corrispondente al round di encryption
         string xored = XorParallel(round_keys[i], right_expanded);
         string res = "";
-        // 3.4. The result is divided into 8 equal parts and passed
-        // through 8 substitution boxes. After passing through a
-        // substituion box, each box is reduces from 6 to 4 bits.
+
+        // Il risultato viene diviso in 8 parti uguali e ognuna di esse viene passata attraverso le substitution boxes
         for(int k=0; k < 8; k++){
-            // Finding row and column indices to look up the
-            // substituition box
+            // Trova l'indice della riga e della colonna da usare nella substitution box
             string row1= xored.substr(k * 6, 1) + xored.substr(k * 6 + 5, 1);
             int row = convertBinaryToDecimalParallel(row1);
-            string col1 = xored.substr(k * 6 + 1, 1) + xored.substr(k * 6 + 2, 1) + xored.substr(k * 6 + 3, 1) + xored.substr(k * 6 + 4, 1);;
+            string col1 = xored.substr(k * 6 + 1, 1) + xored.substr(k * 6 + 2, 1) +
+                    xored.substr(k * 6 + 3, 1) + xored.substr(k * 6 + 4, 1);;
             int col = convertBinaryToDecimalParallel(col1);
             int val = substitutionBoxes2[k][row][col];
             res += convertDecimalToBinaryParallel(val);
         }
-        // 3.5. The result is xored with the left half
+
+        //Il risultato della sostituzione viene messo in xor con la parte di sinistra del plaintext originale
         xored = XorParallel(res, left);
-        // 3.6. The left and the right parts of the plain text are swapped
+        // Vengono scambiate la parte sinistra e destra per prepararsi al nuovo round
         left = xored;
+        // Tranne che all'ultimo round
         if(i < 15){
             string temp = right;
             right = xored;
@@ -247,28 +249,24 @@ string DESParallel(string pt, string* round_keys){
         }
     }
 
-    // 4. The halves of the plain text are applied
+    // Vengono rimesse insieme le due parti
     string ciphertext = left + right;
 
     return ciphertext;
 }
 
-void parallelDecryption(vector<string> lines){
-    int i = 0;
-    int tid;
-    tid = -1;
+// Decriptazione parallela
+void parallelDecryption(vector<string> lines, int size, int nThreads){
     string round_keys[16];
-
     tablesFillerParallel();
-#pragma omp parallel private(round_keys, tid) shared(expansionTable2, substitutionBoxes2)
+    omp_set_num_threads(nThreads);
+
+#pragma omp parallel private(round_keys) shared(expansionTable2, substitutionBoxes2)
     {
-        tid = omp_get_thread_num();
-        cout << "Hello from thread: " << tid << endl;
         generateKeysParallel(round_keys);
         reverseKeysParallel(round_keys);
 #pragma omp for
-        for (int j = 0; j < size(lines); j++) {
-            i++;
+        for (int j = 0; j < size; j++) {
             reverseKeysParallel(round_keys);
             string pt = convertStringToBinary2(lines[j]);
             // Applying the algo
@@ -283,21 +281,6 @@ void parallelDecryption(vector<string> lines){
                 cout << "DECRIPTAZIONE FALLITA" << endl;
                 // CE UN MODO PER FERMARE TUTTI I THREAD??
             }
-            if (i % 10000 == 0)
-                cout << "Eseguite " << i << " decriptazioni" << endl;
         }
     }
-}
-
-void prova(){
-    int V[500000];
-#pragma omp parallel for shared(V)
-    for(int i = 0; i < size(V); i++){
-        V[i] = i+1;
-    }
-
-    for(int i = 0; i < size(V); i++){
-        cout<<V[i]<<"; ";
-    }
-    cout<<"-"<<size(V);
 }
