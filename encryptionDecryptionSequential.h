@@ -12,6 +12,6 @@ void generateKeys();
 void tablesFiller();
 string DES(string plaintext);
 void reverseKeys();
-void sequentialDecryption(vector<string> lines, int size);
+bool sequentialDecryption(vector<string> lines, int size);
 
 #endif //DES_DECRYPTION_ENCRYPTIONDECRYPTIONSEQUENTIAL_H

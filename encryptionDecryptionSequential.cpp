@@ -259,14 +259,13 @@ string DES(string pt){
     return ciphertext;
 }
 
-void sequentialDecryption(vector<string> lines, int size){
-    int i = 0;
+bool sequentialDecryption(vector<string> lines, int size){
+    bool isCorrect = true;
     generateKeys();
     reverseKeys();
     tablesFiller();
     for (int j = 0; j < size; j++) {
         reverseKeys();
-        i++;
         string pt = convertStringToBinary(lines[j]);
         // Calling the function to generate 16 keys
         // Applying the algo
@@ -277,11 +276,11 @@ void sequentialDecryption(vector<string> lines, int size){
         // Comparing the initial plain text with the decrypted text
         string x = convertBinaryToString(decrypted);
         if (x != lines[j]){
+            isCorrect = false;
             cout<<"DECRIPTAZIONE FALLITA"<<endl;
             break;
         }
-        if (i % 10000 == 0)
-            cout<<"Eseguite "<<i<<" decriptazioni"<<endl;
-    }
 
+    }
+    return isCorrect;
 }

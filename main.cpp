@@ -11,21 +11,23 @@
 
 using namespace std;
 
-int main(){
+int main() {
     ifstream file("password.txt");
     // Salva le righe del file in un vettore, per permettere l'elaborazione in modo parallelo
     vector<string> lines(nLines);
-    for (int j = 0; j < nLines; ++j )
-        std::getline(file, lines[j]);
+    for (int j = 0; j < nLines; ++j)
+        getline(file, lines[j]);
 
     // 1) Test all'aumentare del numero di Thread con 5000 password
     // Decriptazione sequenziale
     int sequentialTime = 0;
     for(int i = 0; i<nTest; i++) {
-        auto start = std::chrono::system_clock::now();
-        sequentialDecryption(lines, testLines);
-        auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        auto start = chrono::system_clock::now();
+        if(!sequentialDecryption(lines, testLines)){
+            break;
+        }
+        auto end = chrono::system_clock::now();
+        auto elapsed = chrono::duration_cast<chrono::milliseconds>(end - start);
         sequentialTime += elapsed.count();
     }
     cout << "Tempo Decriptazione Sequenziale: " << sequentialTime/nTest <<endl<<endl;
@@ -35,10 +37,12 @@ int main(){
     for (int nThreads = 2; nThreads < maxThreads+1; nThreads++) {
         int parallelTime = 0;
         for (int i = 0; i < nTest; i++) {
-            auto start = std::chrono::system_clock::now();
-            parallelDecryption(lines, testLines, nThreads);
-            auto end = std::chrono::system_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+            auto start = chrono::system_clock::now();
+            if(!parallelDecryption(lines, testLines, nThreads)){
+                break;
+            }
+            auto end = chrono::system_clock::now();
+            auto elapsed = chrono::duration_cast<chrono::milliseconds>(end - start);
             parallelTime += elapsed.count();
         }
         cout << "Tempo Decriptazione Parallela usando " << nThreads << " threads: " << parallelTime / nTest << endl;
@@ -49,19 +53,23 @@ int main(){
     // 2)Test all'aumentare del numero di password
     // Decriptazione Sequenziale
     for(int n=testLines; n < nLines+1000; n+=1000) {
-        auto start = std::chrono::system_clock::now();
-        sequentialDecryption(lines, n);
-        auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        auto start = chrono::system_clock::now();
+        if(!sequentialDecryption(lines, n)){
+            break;
+        }
+        auto end = chrono::system_clock::now();
+        auto elapsed = chrono::duration_cast<std::chrono::milliseconds>(end - start);
         cout << "Tempo Decriptazione Sequenziale con "<<n<<" password: "<<elapsed.count()<<endl;
     }
 
     // Decriptazione Parallela
     for (int n=testLines; n < nLines+1000; n+=1000) {
-        auto start = std::chrono::system_clock::now();
-        parallelDecryption(lines, n, maxThreads);
-        auto end = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        auto start = chrono::system_clock::now();
+        if(!parallelDecryption(lines, n, maxThreads)){
+            break;
+        }
+        auto end = chrono::system_clock::now();
+        auto elapsed = chrono::duration_cast<chrono::milliseconds>(end - start);
         cout << "Tempo Decriptazione Parallela con " << n << " password: " << elapsed.count() << endl;
     }
 }

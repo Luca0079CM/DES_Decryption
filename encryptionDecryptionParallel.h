@@ -15,6 +15,6 @@ void generateKeysParallel(string* round_keys);
 void tablesFillerParallel();
 string DESParallel(string plaintext, string* round_keys);
 void reverseKeysParallel(string* round_keys);
-void parallelDecryption(vector<string> lines, int size, int nThreads);
+bool parallelDecryption(vector<string> lines, int size, int nThreads);
 
 #endif //DES_DECRYPTION_ENCRYPTIONDECRYPTIONPARALLEL_H

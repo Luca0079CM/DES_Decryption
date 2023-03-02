@@ -251,12 +251,12 @@ string DESParallel(string pt, string* round_keys){
 
     // Vengono rimesse insieme le due parti
     string ciphertext = left + right;
-
     return ciphertext;
 }
 
 // Decriptazione parallela
-void parallelDecryption(vector<string> lines, int size, int nThreads){
+bool parallelDecryption(vector<string> lines, int size, int nThreads){
+    bool isCorrect = true;
     string round_keys[16];
     tablesFillerParallel();
     omp_set_num_threads(nThreads);
@@ -279,8 +279,9 @@ void parallelDecryption(vector<string> lines, int size, int nThreads){
             if (x != lines[j]) {
                 cout << x << "-" << lines[j] << endl;
                 cout << "DECRIPTAZIONE FALLITA" << endl;
-                // CE UN MODO PER FERMARE TUTTI I THREAD??
+                isCorrect = false;
             }
         }
     }
+    return isCorrect;
 }
