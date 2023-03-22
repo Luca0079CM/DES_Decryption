@@ -34,7 +34,7 @@ int main() {
 
     // Decriptazione Parallela
     int maxThreads = omp_get_max_threads();
-    for (int nThreads = 2; nThreads < maxThreads+1; nThreads++) {
+    for (int nThreads = 2; nThreads < 4*maxThreads+1; nThreads++) {
         int parallelTime = 0;
         for (int i = 0; i < nTest; i++) {
             auto start = chrono::system_clock::now();

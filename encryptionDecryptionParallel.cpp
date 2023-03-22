@@ -7,8 +7,8 @@ int expansionTable2[48];
 // Le substitution boxes
 int substitutionBoxes2[8][4][16];
 
+// Funzione per convertire una stringa alfanumerica in una stringa binaria
 string convertStringToBinary2(string s){
-    // hexadecimal to binary conversion
     unordered_map<char, string> mp;
     mp['0'] = "00000000";
     mp['1'] = "00000001";
@@ -59,8 +59,8 @@ string convertStringToBinary2(string s){
     return bin;
 }
 
+// Funzione per convertire una stringa binaria in una stringa alfanumerica
 string convertBinaryToString2(string s){
-    // binary to string conversion
     unordered_map<string, string> mp;
     mp["00000000"] = "0";
     mp["00000001"] = "1";
