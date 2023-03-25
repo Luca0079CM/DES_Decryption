@@ -55,7 +55,6 @@ string convertStringToBinary2(string s){
     for (char i : s) {
         bin += mp[i];
     }
-    //cout<<"Size: "<<size(bin)<<"\n";
     return bin;
 }
 
@@ -269,12 +268,9 @@ bool parallelDecryption(vector<string> lines, int size, int nThreads){
         for (int j = 0; j < size; j++) {
             reverseKeysParallel(round_keys);
             string pt = convertStringToBinary2(lines[j]);
-            // Applying the algo
             string ct = DESParallel(pt, round_keys);
             reverseKeysParallel(round_keys);
-            pt = ct;
-            string decrypted = DESParallel(pt, round_keys);
-            // Comparing the initial plain text with the decrypted text
+            string decrypted = DESParallel(ct, round_keys);
             string x = convertBinaryToString2(decrypted);
             if (x != lines[j]) {
                 cout << x << "-" << lines[j] << endl;

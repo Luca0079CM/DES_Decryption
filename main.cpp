@@ -7,7 +7,7 @@
 
 #define nLines 10000
 #define testLines 5000
-#define nTest 5
+#define nTest 1
 
 using namespace std;
 

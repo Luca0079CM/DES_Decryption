@@ -13,8 +13,8 @@ int expansionTable[48];
 // Le substitution boxes
 int substitutionBoxes[8][4][16];
 
+// Funzione per convertire una stringa alfanumerica in una stringa binaria
 string convertStringToBinary(string s){
-    // hexadecimal to binary conversion
     unordered_map<char, string> mp;
     mp['0'] = "00000000";
     mp['1'] = "00000001";
@@ -61,12 +61,11 @@ string convertStringToBinary(string s){
     for (char i : s) {
         bin += mp[i];
     }
-    //cout<<"Size: "<<size(bin)<<"\n";
     return bin;
 }
 
+// Funzione per convertire una stringa binaria in una stringa alfanumerica
 string convertBinaryToString(string s){
-    // binary to string conversion
     unordered_map<string, string> mp;
     mp["00000000"] = "0";
     mp["00000001"] = "1";
@@ -267,20 +266,16 @@ bool sequentialDecryption(vector<string> lines, int size){
     for (int j = 0; j < size; j++) {
         reverseKeys();
         string pt = convertStringToBinary(lines[j]);
-        // Calling the function to generate 16 keys
-        // Applying the algo
         string ct = DES(pt);
         reverseKeys();
-        pt = ct;
-        string decrypted = DES(pt);
-        // Comparing the initial plain text with the decrypted text
+        string decrypted = DES(ct);
         string x = convertBinaryToString(decrypted);
         if (x != lines[j]){
+            // Se anche solo un plaintext è diverso interrompe
             isCorrect = false;
             cout<<"DECRIPTAZIONE FALLITA"<<endl;
             break;
         }
-
     }
     return isCorrect;
 }
