@@ -259,7 +259,6 @@ bool parallelDecryption(vector<string> lines, int size, int nThreads){
     string round_keys[16];
     tablesFillerParallel();
     omp_set_num_threads(nThreads);
-
 #pragma omp parallel private(round_keys) shared(expansionTable2, substitutionBoxes2)
     {
         generateKeysParallel(round_keys);
